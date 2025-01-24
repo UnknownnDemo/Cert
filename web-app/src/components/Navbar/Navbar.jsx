@@ -1,5 +1,11 @@
-import React from 'react'
+import React from 'react';
+import './Navbar.css';
 
 export const Navbar = () => {
-  return <div>CertiQ</div>;
-}
+  return (
+    <div className="navbar">
+      <button>CertiQ</button>
+      <button>Connect</button>
+    </div>
+  );
+};
