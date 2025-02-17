@@ -5,6 +5,7 @@ import { Navbar } from "../components/Navbar/Navbar";
 import { CenteredBox } from '../components/CenteredBox/CenteredBox';
 import Issue from './Issue';
 import backgroundImage from '../assets/background.jpg'; // Import your image
+import Verify from './Verify';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
       <Routes>
           <Route path="/" element={<CenteredBox />} />
           <Route path="/issue" element={<Issue />} />
+          <Route path="/verify" element={<Verify />} />  
         </Routes>
     </div>
     </Router>
