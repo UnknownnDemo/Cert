@@ -10,7 +10,9 @@ export const CenteredBox = () => {
         <Link to="/issue">
           <button className="actionButton">Issue</button>
           </Link>
+          <Link to="/verify">
           <button className="actionButton">Verify</button>
+          </Link>
         </div>
       </div>
     </div>
