@@ -1,68 +1,81 @@
 import React, { useState } from 'react';
-import '../style/verify.css'; // Import the CSS file
 
 const Verify = () => {
   const [certId, setCertId] = useState('');
-  const [status, setStatus] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
 
-  const validCertificates = {
-    'CERT1234': 'Valid certificate for John Doe',
-    'CERT5678': 'Valid certificate for Jane Smith'
-  };
+  // Sample valid certificate IDs - in real application, this would come from an API/database
+  const validCertIds = ['CERT123', 'CERT456', 'CERT789'];
 
-  const handleVerifyClick = () => {
-    if (!certId.trim()) {
-      setStatus('Please enter a certificate ID');
+  const handleVerify = (e) => {
+    e.preventDefault();
+    
+    if (!certId) {
+      setMessage('Please enter a certificate ID');
       return;
     }
 
-    setIsLoading(true);
-    setStatus('');
+    setIsVerifying(true);
+    setMessage('');
 
-    // Simulate verification delay
+    // Simulate API call
     setTimeout(() => {
-      if (validCertificates[certId.toUpperCase()]) {
-        setStatus(validCertificates[certId.toUpperCase()]);
-      } else {
-        setStatus('Invalid certificate ID');
-      }
-      setIsLoading(false);
-    }, 1500);
-  };
-
-  const handleInputChange = (event) => {
-    // Clean input as user types
-    setCertId(event.target.value.replace(/[^A-Za-z0-9]/g, ''));
+      const isValid = validCertIds.includes(certId.toUpperCase());
+      setMessage(isValid ? 'Certificate is valid' : 'Invalid certificate ID');
+      setIsVerifying(false);
+    }, 1000);
   };
 
   return (
-    <div className="container">
-      <h1>Certificate Verification</h1>
-      
-      <div className="input-field">
-        <label htmlFor="certId">Certificate ID</label>
-        <input 
-          type="text" 
-          id="certId" 
-          placeholder="Enter certificate ID"
+    <div style={{ maxWidth: '400px', margin: '40px auto', padding: '20px' }}>
+      <form onSubmit={handleVerify} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+        <h2 style={{ textAlign: 'center', margin: '0 0 20px' }}>Verify Certificate</h2>
+        
+        <input
+          type="text"
           value={certId}
-          onChange={handleInputChange}
-          maxLength="20"
+          onChange={(e) => setCertId(e.target.value.toUpperCase())}
+          placeholder="Enter Certificate ID"
+          style={{
+            padding: '8px',
+            fontSize: '16px',
+            border: '1px solid #ccc',
+            borderRadius: '4px'
+          }}
         />
-      </div>
 
-      <button onClick={handleVerifyClick} disabled={isLoading}>
-        {isLoading ? 'Verifying...' : 'Verify Certificate'}
-      </button>
+        <button
+          type="submit"
+          disabled={isVerifying}
+          style={{
+            padding: '10px',
+            fontSize: '16px',
+            backgroundColor: isVerifying ? '#ccc' : '#0066cc',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: isVerifying ? 'not-allowed' : 'pointer'
+          }}
+        >
+          {isVerifying ? 'Verifying...' : 'Verify'}
+        </button>
 
-      {isLoading && <div className="spinner"></div>}
-
-      <div className={`status ${status === 'Valid certificate for John Doe' || status === 'Valid certificate for Jane Smith' ? 'valid' : 'invalid'}`}>
-        {status}
-      </div>
+        {message && (
+          <div style={{
+            padding: '10px',
+            marginTop: '10px',
+            backgroundColor: message === 'Certificate is valid' ? '#e6ffe6' : '#ffe6e6',
+            border: `1px solid ${message === 'Certificate is valid' ? '#99ff99' : '#ffcccc'}`,
+            borderRadius: '4px',
+            textAlign: 'center'
+          }}>
+            {message}
+          </div>
+        )}
+      </form>
     </div>
   );
-}
+};
 
 export default Verify;
