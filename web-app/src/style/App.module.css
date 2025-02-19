@@ -2,7 +2,7 @@
 
 .App {
   background-color: var(--color-bg);
-  background-image: url('./assets/background.jpg'); /* Adjust path to your image */
+  background-image: url('./assets/back.jpeg'); /* Adjust path to your image */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

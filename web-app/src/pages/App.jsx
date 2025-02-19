@@ -4,7 +4,7 @@ import styles from "../style/App.module.css";
 import { Navbar } from "../components/Navbar/Navbar";
 import { CenteredBox } from '../components/CenteredBox/CenteredBox';
 import Issue from './Issue';
-import backgroundImage from '../assets/background.jpg'; // Import your image
+import backgroundImage from '../assets/back.jpeg'; // Import your image
 import Verify from './Verify';
 
 function App() {
