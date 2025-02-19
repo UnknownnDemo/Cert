@@ -3,15 +3,27 @@ import React, { useState } from 'react';
 const styles = {
   container: {
     minHeight: '100vh',
-    backgroundColor: '#f5f5f5',
+    backgroundImage: 'url("../assets/back.jpeg")', // Ensure correct path
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    backgroundAttachment: 'fixed', // Keeps the background fixed while scrolling
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     padding: '24px'
+    
   },
   formWrapper: {
-    maxWidth: '800px',
-    margin: '0 auto',
-    backgroundColor: 'white',
+    maxWidth: '700px',
+    width: '90%',
+    backgroundColor: 'rgba(255, 255, 255, 0.5)', // More transparency
     borderRadius: '8px',
-    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)', // Deeper shadow for contrast
+    padding: '16px',
+    backdropFilter: 'blur(12px)', // Stronger blur effect
+    maxHeight: '85vh', // Limit form height
+    overflowY: 'auto'
   },
   header: {
     padding: '24px',
