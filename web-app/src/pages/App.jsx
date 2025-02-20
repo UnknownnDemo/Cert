@@ -1,10 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import styles from "../style/App.module.css";
-import { Navbar } from "../components/Navbar/Navbar";
+import Navbar from "../components/Navbar/Navbar";
 import { CenteredBox } from '../components/CenteredBox/CenteredBox';
 import Issue from './Issue';
-import backgroundImage from '../assets/back.jpeg'; // Import your image
+import Register from './Register';
+import backgroundImage from '../assets/background.jpg'; // Import your image
 import Verify from './Verify';
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
     >
       <Navbar />
       <Routes>
+          <Route path="/register" element={<Register />} />
           <Route path="/" element={<CenteredBox />} />
           <Route path="/issue" element={<Issue />} />
           <Route path="/verify" element={<Verify />} />  
