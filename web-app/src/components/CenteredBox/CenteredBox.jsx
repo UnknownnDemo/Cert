@@ -59,7 +59,12 @@ export const CenteredBox = () => {
       alert("Please connect your wallet to issue a certificate.");
       return;
     } 
-    navigate(isRegistered ? "/issue" : "/register");
+    // navigate(isRegistered ? "/issue" : "/");
+    if (isRegistered) {
+      navigate("/issue");
+    } else {
+      alert("Please register your institute before issuing a certificate.");
+    }
   };
 
   return (

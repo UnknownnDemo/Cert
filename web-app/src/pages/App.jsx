@@ -28,7 +28,7 @@ function App() {
           <Route path="/" element={<CenteredBox />} />
           <Route path="/issue" element={<Issue />} />
           <Route path="/verify" element={<Verify />} />  
-        </Routes>
+      </Routes>
     </div>
     </Router>
   );

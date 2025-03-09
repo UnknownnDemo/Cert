@@ -5,9 +5,9 @@ module.exports = {
   solidity: "0.8.0",
   networks: {
     hardhat: {},
-    polygonZkEVM: {
-      url: process.env.ALCHEMY_URL, // Using Alchemy for Polygon zkEVM Cardona
-      accounts: [process.env.PRIVATE_KEY],
+    polygonzkEVM: {  // Ensure lowercase "polygonzkEVM" to match CLI command
+      url: process.env.ALCHEMY_URL, // Ensure consistency in env variable name
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [], // Securely load private key
     },
   },
 };
