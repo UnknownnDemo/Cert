@@ -78,13 +78,13 @@ const Navbar = () => {
     }
   };
 
-  const handleRegisterClick = () => {
-    if (isAdmin) {
-      navigate("/register");
-    } else {
-      alert("Only the admin can register new institutes.");
-    }
-  };
+  // const handleRegisterClick = () => {
+  //   if (isAdmin) {
+  //     navigate("/register");
+  //   } else {
+  //     alert("Only the admin can register new institutes.");
+  //   }
+  // };
 
   return (
     <nav className="navbar">
@@ -93,7 +93,7 @@ const Navbar = () => {
         <button onClick={connectWallet} className="nav-button">
           {account ? "Connected" : "Connect"}
         </button>
-        <button onClick={handleRegisterClick}>Register Institute</button>
+        {isAdmin && <button onClick={() => navigate("/register")}>Register Institute</button>}     
       </div>
     </nav>
   );
