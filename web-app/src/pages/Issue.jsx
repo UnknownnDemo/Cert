@@ -167,21 +167,7 @@ const Issue = () => {
           <div style={styles.section}>
             <h2 style={styles.sectionTitle}>Institute Details</h2>
             
-            <div style={styles.formGroup}>
-              <label style={styles.label} htmlFor="instituteName">
-                Institute Name *
-              </label>
-              <input
-                style={styles.input}
-                type="text"
-                id="instituteName"
-                name="instituteName"
-                value={formData.instituteName}
-                onChange={handleChange}
-                required
-                placeholder="Enter institute name"
-              />
-            </div>
+            
 
             <div style={styles.formGroup}>
               <label style={styles.label} htmlFor="department">
