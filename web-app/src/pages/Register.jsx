@@ -1,6 +1,8 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
+import "../style/register.css"; 
 
 const contractABI = [
   {
@@ -131,39 +133,65 @@ const Register = () => {
   };
 
   return (
-    <div>
-      <h1>Register Institute</h1>
-      <input
-        type="text"
-        placeholder="Enter Institute Wallet Address"
-        value={instituteWallet}
-        onChange={(e) => setInstituteWallet(e.target.value)}
-        disabled={loading}
-      />
-      <input
-        type="text"
-        placeholder="Enter Institution Name"
-        value={institutionName}
-        onChange={(e) => setInstitutionName(e.target.value)}
-        disabled={loading}
-      />
-      <input
-        type="text"
-        placeholder="Enter Acronym"
-        value={acronym}
-        onChange={(e) => setAcronym(e.target.value)}
-        disabled={loading}
-      />
-      <input
-        type="text"
-        placeholder="Enter Website URL"
-        value={website}
-        onChange={(e) => setWebsite(e.target.value)}
-        disabled={loading}
-      />
-      <button onClick={registerInstitute} disabled={loading || !account}>
-        {loading ? "Registering..." : account ? "Register" : "Connect Wallet First"}
-      </button>
+    <div className="registration-container">
+      <div className="registration-card">
+        <h1 className="registration-title">Register Institute</h1>
+        <div className="form-group">
+          <label htmlFor="instituteWallet">Institute Wallet Address</label>
+          <input
+            id="instituteWallet"
+            type="text"
+            placeholder="Enter Institute Wallet Address"
+            value={instituteWallet}
+            onChange={(e) => setInstituteWallet(e.target.value)}
+            disabled={loading}
+          />
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="institutionName">Institution Name</label>
+          <input
+            id="institutionName"
+            type="text"
+            placeholder="Enter Institution Name"
+            value={institutionName}
+            onChange={(e) => setInstitutionName(e.target.value)}
+            disabled={loading}
+          />
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="acronym">Acronym</label>
+          <input
+            id="acronym"
+            type="text"
+            placeholder="Enter Acronym"
+            value={acronym}
+            onChange={(e) => setAcronym(e.target.value)}
+            disabled={loading}
+          />
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="website">Website URL</label>
+          <input
+            id="website"
+            type="text"
+            placeholder="Enter Website URL"
+            value={website}
+            onChange={(e) => setWebsite(e.target.value)}
+            disabled={loading}
+          />
+        </div>
+        
+        <button 
+          className="registration-button"
+          onClick={registerInstitute} 
+          disabled={loading || !account}
+        >
+          {loading ? "Registering..." : account ? "Register" : "Connect Wallet First"}
+        </button>
+      </div>
     </div>
   );
 };
