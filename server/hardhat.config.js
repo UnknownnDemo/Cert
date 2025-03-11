@@ -9,5 +9,8 @@ module.exports = {
       url: process.env.ALCHEMY_URL, // Ensure consistency in env variable name
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [], // Securely load private key
     },
+    localhost: {
+      url:"http://127.0.0.1:8545",
+    }
   },
 };
