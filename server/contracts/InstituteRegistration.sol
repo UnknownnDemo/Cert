@@ -1,35 +1,4 @@
-// // SPDX-License-Identifier: MIT
-// pragma solidity ^0.8.0;
-
-// contract InstituteRegistration {
-//     struct Institute {
-//         string name;
-//         uint256 registrationTime;
-//         bool exists;
-//     }
-
-//     mapping(address => Institute) public institutes;
-
-//     event InstituteRegistered(address indexed instituteAddress, string name, uint256 registrationTime);
-
-//     function registerInstitute(string memory _name) public {
-//         require(!institutes[msg.sender].exists, "Institute already registered");
-
-//         institutes[msg.sender] = Institute({
-//             name: _name,
-//             registrationTime: block.timestamp,
-//             exists: true
-//         });
-
-//         emit InstituteRegistered(msg.sender, _name, block.timestamp);
-//     }
-
-//     function isRegistered(address _institute) public view returns (bool) {
-//         return institutes[_institute].exists;
-//     }
-// }
-
-
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 contract InstituteRegistration {
@@ -47,14 +16,44 @@ contract InstituteRegistration {
         string courseName;
     }
 
+    struct Certificate {
+        string instituteName;
+        string department;
+        string firstName;
+        string lastName;
+        string certificantId;
+        string email;
+        string courseCompleted;
+        uint256 completionDate;
+        string notes;
+        string ipfsHash;
+        bool isValid;
+        address issuer;
+    }
+
     mapping(address => Institute) public institutes;
     mapping(address => Course[]) public instituteCourses;
+    mapping(bytes32 => Certificate) public certificates;
 
     event InstituteRegistered(address indexed instituteAddress, string name, uint256 registrationTime);
     event CourseAdded(address indexed instituteAddress, string courseName);
+    event CertificateIssued(
+        bytes32 indexed certHash,
+        string instituteName,
+        string department,
+        string firstName,
+        string lastName,
+        string certificantId,
+        string email,
+        string courseCompleted,
+        uint256 completionDate,
+        string notes,
+        string ipfsHash
+    );
+    event CertificateRevoked(bytes32 indexed certHash);
 
     modifier onlyOwner() {
-        require(msg.sender == owner, "Unauthorized: Only owner can add institutes");
+        require(msg.sender == owner, "Unauthorized: Only owner can perform this action");
         _;
     }
 
@@ -64,7 +63,7 @@ contract InstituteRegistration {
     }
 
     constructor() {
-        owner = msg.sender; // Set the contract deployer as the owner
+        owner = msg.sender;
     }
 
     function registerInstitute(
@@ -91,9 +90,7 @@ contract InstituteRegistration {
 
     function addCourse(string memory _courseName) public onlyRegisteredInstitute {
         require(bytes(_courseName).length > 0, "Course name cannot be empty");
-
         instituteCourses[msg.sender].push(Course({ courseName: _courseName }));
-
         emit CourseAdded(msg.sender, _courseName);
     }
 
@@ -108,14 +105,51 @@ contract InstituteRegistration {
         uint256 registrationTime
     ) {
         require(institutes[_instituteAddress].exists, "Institute not found");
-        
         Institute memory inst = institutes[_instituteAddress];
         return (inst.name, inst.acronym, inst.website, inst.registrationTime);
     }
 
     function getCourses(address _instituteAddress) public view returns (Course[] memory) {
         require(institutes[_instituteAddress].exists, "Institute not found");
-        
         return instituteCourses[_instituteAddress];
+    }
+
+    function issueCertificate(
+        string memory instituteName,
+        string memory department,
+        string memory firstName,
+        string memory lastName,
+        string memory certificantId,
+        string memory email,
+        string memory courseCompleted,
+        uint256 completionDate,
+        string memory notes,
+        string memory ipfsHash
+    ) public onlyRegisteredInstitute {
+        bytes32 certHash = keccak256(abi.encodePacked(
+            instituteName, department, firstName, lastName, certificantId, email, courseCompleted, completionDate, notes, ipfsHash
+        ));
+
+        certificates[certHash] = Certificate(
+            instituteName, department, firstName, lastName, certificantId, email, courseCompleted, completionDate, notes, ipfsHash, true, msg.sender
+        );
+
+        emit CertificateIssued(certHash, instituteName, department, firstName, lastName, certificantId, email, courseCompleted, completionDate, notes, ipfsHash);
+    }
+
+    function revokeCertificate(bytes32 certHash) public {
+        require(certificates[certHash].isValid, "Certificate does not exist or is already revoked");
+        require(certificates[certHash].issuer == msg.sender, "Only the issuing institute can revoke this certificate");
+        certificates[certHash].isValid = false;
+        emit CertificateRevoked(certHash);
+    }
+
+    function verifyCertificate(bytes32 certHash) public view returns (
+        bool, string memory, string memory, string memory, string memory, string memory, string memory, string memory, uint256, string memory, string memory
+    ) {
+        Certificate memory cert = certificates[certHash];
+        return (
+            cert.isValid, cert.instituteName, cert.department, cert.firstName, cert.lastName, cert.certificantId, cert.email, cert.courseCompleted, cert.completionDate, cert.notes, cert.ipfsHash
+        );
     }
 }
