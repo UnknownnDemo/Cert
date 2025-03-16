@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-
+import { ethers } from 'ethers';
+import contractABI from '../../../server/artifacts/contracts/InstituteRegistration.sol/InstituteRegistration.json';
+const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 const styles = {
   container: {
     minHeight: '100vh',
@@ -123,8 +125,11 @@ const Issue = () => {
     email: '',
     courseCompleted: '',
     completionDate: '',
-    notes: ''
+    notes: '',
+    ipfsHash: ''
   });
+
+  const [status, setStatus] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -134,11 +139,43 @@ const Issue = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Form submitted:', formData);
-    // Handle form submission here
-  };
+  const handleSubmit = async (e) => {
+      e.preventDefault();
+      setStatus('Processing transaction...');
+  
+      if (!window.ethereum) {
+        setStatus('Metamask not detected. Please install Metamask.');
+        return;
+      }
+  
+      try {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();  // Get the connected wallet
+  
+        const contract = new ethers.Contract(contractAddress, contractABI.abi, signer);
+  
+        const tx = await contract.issueCertificate(
+          formData.instituteName,
+          formData.department,
+          formData.firstName,
+          formData.lastName,
+          formData.certificantId,
+          formData.email,
+          formData.courseCompleted,
+          Math.floor(new Date(formData.completionDate).getTime() / 1000), // Convert to Unix timestamp
+          formData.notes,
+          formData.ipfsHash // IPFS hash for certificate storage
+        );
+        const receipt = await tx.wait();
+        setStatus('Transaction sent. Waiting for confirmation...');
+        await tx.wait();  // Wait for the transaction to be mined
+        const certHash = receipt.logs[0].topics[1];
+        setStatus(`Certificate issued successfully! TX Hash: ${certHash}`);
+      } catch (error) {
+        console.error(error);
+        setStatus(`Error: ${error.message}`);
+      }
+    };
 
   const handleCancel = () => {
     setFormData({
@@ -150,8 +187,10 @@ const Issue = () => {
       email: '',
       courseCompleted: '',
       completionDate: '',
-      notes: ''
+      notes: '',
+      ipfsHash: ''
     });
+    setStatus('');
   };
 
   return (
@@ -166,6 +205,7 @@ const Issue = () => {
           {/* Institute Details Section */}
           <div style={styles.section}>
             <h2 style={styles.sectionTitle}>Institute Details</h2>
+            <input type="text" name="instituteName" value={formData.instituteName} onChange={handleChange} placeholder="Institute Name" required />
             
             
 
@@ -315,9 +355,10 @@ const Issue = () => {
               type="submit"
               style={{...styles.button, ...styles.submitButton}}
             >
-              Submit Request
+              Issue certificate
             </button>
           </div>
+          {status && <p>{status}</p>}
         </form>
       </div>
     </div>
