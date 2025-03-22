@@ -266,7 +266,6 @@ const VerifyCertificate = () => {
       const certData = await contract.certificates(certHash);
       
       // Check if the connected wallet is the issuer
-      // The issuer is the 11th field in the struct (0-indexed)
       setIsIssuer(certData[11] && certData[11].toLowerCase() === connectedAccount.toLowerCase());
     } catch (error) {
       console.error("Error checking issuer status:", error);
@@ -276,8 +275,15 @@ const VerifyCertificate = () => {
 
   const getProvider = () => {
     // For read-only operations, use a JsonRpcProvider
-    const network = import.meta.env.REACT_APP_ALCHEMY_URL || "http://localhost:8545";
-    return new ethers.JsonRpcProvider(network);
+    const network = import.meta.env.REACT_APP_ALCHEMY_URL || "https://rpc-amoy.polygon.technology";
+    try{
+      return new ethers.JsonRpcProvider(network);
+    }
+    catch(error){
+      console.error("Error creating provider:", error);
+    // Fallback to public RPC if your Alchemy URL fails
+      return new ethers.JsonRpcProvider("https://rpc-amoy.polygon.technology")
+    }
   };
 
   const handleVerify = async (e) => {
@@ -296,6 +302,10 @@ const VerifyCertificate = () => {
       const provider = getProvider();
       const contract = new ethers.Contract(contractAddress, contractABI, provider);
 
+      //add network verification
+      const network = await provider.getNetwork();
+      console.log("Connected to network:", network);
+
       // Using the verifyCertificate function from your contract
       const certificateData = await contract.verifyCertificate(certHash);
       
@@ -303,6 +313,7 @@ const VerifyCertificate = () => {
       if (!certificateData || !certificateData[1]) {
         throw new Error('Certificate not found');
       }
+    // Add network verification
 
       // Format the certificate data based on the return values from verifyCertificate
       const formattedCertificate = {

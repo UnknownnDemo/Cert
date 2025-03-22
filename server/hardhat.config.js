@@ -11,6 +11,11 @@ module.exports = {
     },
     localhost: {
       url:"http://127.0.0.1:8545",
-    }
+    },
+    polygonAmoy: {
+      url: process.env.ALCHEMY_URL,
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],  // Ensure PRIVATE_KEY is stored securely
+  }
+
   },
 };
