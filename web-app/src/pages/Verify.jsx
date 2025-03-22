@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import InstituteRegistration from '../../../server/artifacts/contracts/InstituteRegistration.sol/InstituteRegistration.json';
+import { useSearchParams } from "react-router-dom";
 
 const styles = {
   container: {
@@ -186,6 +187,8 @@ const contractABI = InstituteRegistration.abi;
 const contractAddress = import.meta.env.VITE_CONTRACT_ADDRESS;
 
 const VerifyCertificate = () => {
+  const [searchParams] = useSearchParams();
+  const paramValue = searchParams.get("hash"); // Get 'hash' from URL
   const [certHash, setCertHash] = useState('');
   const [certificate, setCertificate] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -210,6 +213,12 @@ const VerifyCertificate = () => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (paramValue) {
+      setCertHash(paramValue);
+    }
+  }, [paramValue]);
 
   // Check if the connected wallet is the certificate issuer whenever the certificate or connected account changes
   useEffect(() => {
