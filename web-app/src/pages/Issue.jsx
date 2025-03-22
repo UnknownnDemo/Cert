@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { ethers } from 'ethers';
-import contractABI from '../../../server/artifacts/contracts/InstituteRegistration.sol/InstituteRegistration.json';
+import { QRCodeCanvas } from 'qrcode.react';import contractABI from '../../../server/artifacts/contracts/InstituteRegistration.sol/InstituteRegistration.json';
+import { useRef } from 'react';
+const verifyBaseUrl = import.meta.env.VITE_VERIFY_URL || 'http://localhost:5173/verify';
 const contractAddress = import.meta.env.VITE_CONTRACT_ADDRESS;
 const styles = {
   container: {
@@ -112,6 +114,38 @@ const styles = {
     backgroundColor: '#2563eb',
     border: 'none',
     color: 'white'
+  },
+  qrCodeContainer: {
+    marginTop: '24px',
+    padding: '16px',
+    border: '1px solid #e5e5e5', 
+    borderRadius: '8px',
+    backgroundColor: 'white',
+    textAlign: 'center',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '16px'
+  },
+  qrCodeTitle: {
+    fontSize: '16px',
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: '8px'
+  },
+  downloadButton: {
+    backgroundColor: '#10b981',
+    border: 'none',
+    color: 'white',
+    padding: '8px 16px',
+    borderRadius: '4px',
+    fontSize: '14px',
+    fontWeight: '500',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px'
   }
 };
 
@@ -130,6 +164,10 @@ const Issue = () => {
   });
 
   const [status, setStatus] = useState('');
+  const [certHash, setCertHash] = useState('');
+  const [transactionComplete, setTransactionComplete] = useState(false);
+  const qrCodeRef= useRef(null);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -142,7 +180,9 @@ const Issue = () => {
   const handleSubmit = async (e) => {
       e.preventDefault();
       setStatus('Processing transaction...');
-  
+      setTransactionComplete(false);
+      setCertHash('');
+
       if (!window.ethereum) {
         setStatus('Metamask not detected. Please install Metamask.');
         return;
@@ -166,11 +206,18 @@ const Issue = () => {
           formData.notes,
           formData.ipfsHash // IPFS hash for certificate storage
         );
-        const receipt = await tx.wait();
+
         setStatus('Transaction sent. Waiting for confirmation...');
-        await tx.wait();  // Wait for the transaction to be mined
-        const certHash = receipt.logs[0].topics[1];
-        setStatus(`Certificate issued successfully! TX Hash: ${certHash}`);
+        const receipt = await tx.wait();
+        // Extract certificate hash from transaction logs
+        const hash = receipt.logs[0].topics[1];
+        // Remove the leading "0x" and any leading zeros to get the clean hash
+        // const cleanHash = hash.replace(/^0x0*/, '');
+
+        
+        setCertHash(hash);
+        setTransactionComplete(true);
+        setStatus(`Certificate issued successfully! Certificate Hash: ${hash}`);
       } catch (error) {
         console.error(error);
         setStatus(`Error: ${error.message}`);
@@ -191,7 +238,30 @@ const Issue = () => {
       ipfsHash: ''
     });
     setStatus('');
+    setCertHash('');
+    setTransactionComplete(false);
   };
+
+  const downloadQRCode = () => {
+    // Get the canvas element
+    const canvas = document.getElementById('certificate-qr-code');
+    if (!canvas) return;
+
+    // Create a temporary link element
+    const link = document.createElement('a');
+    
+    // Set link attributes
+    link.download = `certificate-${formData.certificantId}-verification-qr.png`;
+    link.href = canvas.toDataURL('image/png');
+    
+    // Append to document, click, and remove
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const verificationUrl = certHash ? `${verifyBaseUrl}?hash=${certHash}` : '';
+
 
   return (
     <div style={styles.container}>
@@ -342,6 +412,41 @@ const Issue = () => {
             />
           </div>
 
+          {/* QR Code section - only shown after successful transaction */}
+          {transactionComplete && certHash && (
+            <div style={styles.qrCodeContainer}>
+              <h3 style={styles.qrCodeTitle}>Certificate Verification QR Code</h3>
+              <p>Scan this QR code to verify the certificate</p>
+              
+              <QRCodeCanvas
+                id="certificate-qr-code"
+                value={verificationUrl}
+                size={200}
+                level="H"
+                ref={qrCodeRef}
+              />
+              
+              <button
+                type="button"
+                onClick={downloadQRCode}
+                style={styles.downloadButton}
+              >
+                Download QR Code
+              </button>
+              
+              <p style={{fontSize: '12px', color: '#666'}}>
+                Certificate Hash: {certHash}
+              </p>
+            </div>
+          )}
+
+          {/* Status message */}
+          {status && (
+            <div style={{marginTop: '16px', padding: '12px', backgroundColor: '#f8f9fa', borderRadius: '4px'}}>
+              <p style={{margin: 0}}>{status}</p>
+            </div>
+          )}
+
           {/* Buttons */}
           <div style={styles.buttonGroup}>
             <button
@@ -358,7 +463,7 @@ const Issue = () => {
               Issue certificate
             </button>
           </div>
-          {status && <p>{status}</p>}
+          {/* {status && <p>{status}</p>} */}
         </form>
       </div>
     </div>
