@@ -2,10 +2,13 @@ require("dotenv").config();
 const { ethers } = require("ethers");
 const express = require("express");
 const cors = require("cors");
+const abiRoutes = require("./routes/abi");
+
 
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use("/api", abiRoutes);
 
 const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS;
 const ALCHEMY_URL = process.env.ALCHEMY_URL;
