@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ethers } from 'ethers';
-import { QRCodeCanvas } from 'qrcode.react';import contractABI from '../../../server/artifacts/contracts/InstituteRegistration.sol/InstituteRegistration.json';
+import { QRCodeCanvas } from 'qrcode.react';
+import { getContractInstance } from "../utils/getABI.js";
 import { useRef } from 'react';
 const verifyBaseUrl = import.meta.env.VITE_VERIFY_URL || 'http://localhost:5173/verify';
 const contractAddress = import.meta.env.VITE_CONTRACT_ADDRESS;
@@ -189,10 +190,8 @@ const Issue = () => {
       }
   
       try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();  // Get the connected wallet
-  
-        const contract = new ethers.Contract(contractAddress, contractABI.abi, signer);
+        const contract = await getContractInstance(contractAddress);
+        if (!contract) return;
   
         const tx = await contract.issueCertificate(
           formData.instituteName,

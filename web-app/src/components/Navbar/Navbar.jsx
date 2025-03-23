@@ -2,16 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
 import "./Navbar.css";
-
-const contractABI = [
-  {
-    inputs: [],
-    name: "owner",
-    outputs: [{ internalType: "address", name: "", type: "address" }],
-    stateMutability: "view",
-    type: "function",
-  },
-];
+import { getContractInstance } from "../../utils/getABI.js";
 
 const Navbar = () => {
   const [account, setAccount] = useState(null);
@@ -68,8 +59,8 @@ const Navbar = () => {
     if (!contractAddress) return;
 
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const contract = new ethers.Contract(contractAddress, contractABI, provider);
+      const contract = await getContractInstance(contractAddress);
+      if (!contract) return;
       const owner = await contract.owner();
 
       setIsAdmin(walletAddress.toLowerCase() === owner.toLowerCase());

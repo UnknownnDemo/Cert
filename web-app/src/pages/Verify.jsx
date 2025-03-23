@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
-import InstituteRegistration from '../../../server/artifacts/contracts/InstituteRegistration.sol/InstituteRegistration.json';
 import { useSearchParams } from "react-router-dom";
+const API_URL = "http://localhost:5000/api/abi";
 
 const styles = {
   container: {
@@ -183,7 +183,17 @@ const styles = {
   }
 };
 
-const contractABI = InstituteRegistration.abi;
+async function fetchABI() {
+  try {
+      const response = await fetch(API_URL);
+      return await response.json();
+  } catch (error) {
+      console.error("Error fetching ABI:", error);
+      return null;
+  }
+}
+
+const contractABI = await fetchABI();
 const contractAddress = import.meta.env.VITE_CONTRACT_ADDRESS;
 
 const VerifyCertificate = () => {

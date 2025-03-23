@@ -3,35 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
 import "../style/register.css"; 
-
-const contractABI = [
-  {
-    inputs: [],
-    name: "owner",
-    outputs: [{ internalType: "address", name: "", type: "address" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "address", name: "_institute", type: "address" }],
-    name: "isRegistered",
-    outputs: [{ internalType: "bool", name: "", type: "bool" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      { internalType: "address", name: "_instituteAddress", type: "address" },
-      { internalType: "string", name: "_name", type: "string" },
-      { internalType: "string", name: "_acronym", type: "string" },
-      { internalType: "string", name: "_website", type: "string" },
-    ],
-    name: "registerInstitute",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-];
+import { getContractInstance } from "../utils/getABI.js";
 
 const Register = () => {
   const [loading, setLoading] = useState(false);
@@ -65,8 +37,9 @@ const Register = () => {
     if (!contractAddress) return;
 
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const contract = new ethers.Contract(contractAddress, contractABI, provider);
+      const contract = await getContractInstance(contractAddress);
+      if (!contract) return;
+
       const owner = await contract.owner();
 
       setIsAdmin(walletAddress.toLowerCase() === owner.toLowerCase());
@@ -81,8 +54,8 @@ const Register = () => {
       return true;
     }
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const contract = new ethers.Contract(contractAddress, contractABI, provider);
+      const contract = await getContractInstance(contractAddress);
+        if (!contract) return true;
 
       const isRegistered = await contract.isRegistered(walletAddress);
       return isRegistered;
@@ -115,9 +88,8 @@ const Register = () => {
         return;
       }
 
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-      const contract = new ethers.Contract(contractAddress, contractABI, signer);
+      const contract = await getContractInstance(contractAddress);
+      if (!contract) return true;
 
       const tx = await contract.registerInstitute(instituteWallet, institutionName, acronym, website);
       await tx.wait();
